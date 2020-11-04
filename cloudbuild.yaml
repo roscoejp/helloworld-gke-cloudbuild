@@ -1,0 +1,25 @@
+steps:
+- name: gcr.io/google.com/cloudsdktool/cloud-sdk
+  entrypoint: bash
+  args: 
+  - -c
+  - |
+    gcloud container clusters get-credentials $_GKE_CLUSTER --region=$_ZONE --project=$PROJECT_ID --internal-ip
+- name: gcr.io/google.com/cloudsdktool/cloud-sdk
+  entrypoint: bash
+  args: 
+  - -c
+  - |
+    kubectl apply -f helloworld.yaml
+  env:
+  - https_proxy=${_K8S_API_PROXY}:${_K8S_API_PROXY_PORT}
+substitutions:
+  _ZONE: us-east1-c
+  _GKE_CLUSTER: my-cluster
+  _K8S_API_PROXY: 127.0.0.1
+  _K8S_API_PROXY_PORT: '8118'
+  _WORKERPOOL_PROJECT_ID: my-project
+  _WORKERPOOL_REGION: us-east1
+  _WORKERPOOL_NAME: workerpool
+options:
+  workerPool: 'projects/${_WORKERPOOL_PROJECT_ID}/locations/${_WORKERPOOL_REGION}/workerPools/${_WORKERPOOL_NAME}'
